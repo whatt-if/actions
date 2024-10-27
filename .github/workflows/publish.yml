@@ -1,0 +1,42 @@
+name: '📦 Publish packages'
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  publish:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+          registry-url: https://npm.pkg.github.com
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Check PR Labels
+        id: check_labels
+        run: |
+          LABELS=$(jq -r '.pull_request.labels | .[] | .name' "$GITHUB_EVENT_PATH")
+          echo "Labels found: $LABELS"
+          if [[ "$LABELS" == *"stable"* ]]; then
+            echo "Publishing as stable."
+            echo "publish_type=stable" >> $GITHUB_ENV
+          elif [[ "$LABELS" == *"beta"* ]]; then
+            echo "Publishing as beta."
+            echo "publish_type=beta" >> $GITHUB_ENV
+          else
+            echo "Publishing as alpha."
+            echo "publish_type=alpha" >> $GITHUB_ENV
+          fi
+
+      - name: Bootstrap Lerna
+        run: npx lerna bootstrap
