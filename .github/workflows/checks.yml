@@ -16,15 +16,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+      - name: Check for package.json
+        id: check_package
+        run: |
+          if [ -f "package.json" ]; then
+            echo "package.json found."
+            echo "run_tests=true" >> $GITHUB_ENV
+          else
+            echo "No package.json found, skipping build and tests."
+            echo "run_tests=false" >> $GITHUB_ENV
+          fi
+
       - name: Set up Node.js
+        if: ${{ env.run_tests == 'true' }}
         uses: actions/setup-node@v2
         with:
           node-version: '18'
 
       - name: Install dependencies
+        if: ${{ env.run_tests == 'true' }}
         run: npm install
 
       - name: Run Tests
+        if: ${{ env.run_tests == 'true' }}
         run: |
           if [ -f "jest.config.js" ]; then
             echo "Running tests..."
@@ -34,4 +48,5 @@ jobs:
           fi
 
       - name: Build Packages
+        if: ${{ env.run_tests == 'true' }}
         run: npx lerna run build
