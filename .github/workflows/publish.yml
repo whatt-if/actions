@@ -29,6 +29,8 @@ jobs:
           registry-url: https://npm.pkg.github.com
 
       - name: Install dependencies
+        env:
+          AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         run: npm install
 
       - name: Check PR Labels
