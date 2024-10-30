@@ -56,10 +56,18 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         run: |
+          set -e 
           if [ "$publish_type" == "stable" ]; then
-            npx lerna publish patch --yes --conventional-commits --message "chore: update version and changelog" --conventional-graduate
+            npx lerna publish patch --yes --conventional-commits --message "chore: update version and changelog" --conventional-graduate || true
           elif [ "$publish_type" == "beta" ]; then
-            npx lerna publish prerelease --preid beta --yes --conventional-commits --message "chore: update version and changelog" --conventional-prerelease
+            npx lerna publish prerelease --preid beta --yes --conventional-commits --message "chore: update version and changelog" --conventional-prerelease || true
           else
-            npx lerna publish prerelease --preid alpha --yes --conventional-commits --message "chore: update version and changelog" --conventional-prerelease
+            npx lerna publish prerelease --preid alpha --yes --conventional-commits --message "chore: update version and changelog" --conventional-prerelease || true
           fi
+
+      - name: Commit changes
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add packages/*/CHANGELOG.md packages/*/package.json
+          git commit -m "chore: update changelogs and package versions" || echo "No changes to commit"
