@@ -49,8 +49,8 @@ jobs:
             echo "publish_type=alpha" >> $GITHUB_ENV
           fi
 
-      - name: Bootstrap Lerna
-        run: npx lerna bootstrap
+      - name: Install dependencies with Lerna
+        run: npx lerna run install
 
       - name: Publish with Lerna
         env:
