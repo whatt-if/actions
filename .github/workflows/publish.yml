@@ -49,19 +49,14 @@ jobs:
             echo "publish_type=alpha" >> $GITHUB_ENV
           fi
 
-      - name: Install dependencies with Lerna
-        run: npx lerna run install
-
-      - name: Publish with Lerna
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+      - name: Generate changelogs and update versions
         run: |
           if [ "$publish_type" == "stable" ]; then
-            npx lerna publish patch --yes --conventional-commits --no-commit --conventional-graduate
+            npx lerna version patch --yes --conventional-commits --conventional-graduate
           elif [ "$publish_type" == "beta" ]; then
-            npx lerna publish prerelease --preid beta --yes --conventional-commits --no-commit --conventional-prerelease
+            npx lerna version prerelease --preid beta --yes --conventional-commits --conventional-prerelease
           else
-            npx lerna publish prerelease --preid alpha --yes --conventional-commits --no-commit --conventional-prerelease
+            npx lerna version prerelease --preid alpha --yes --conventional-commits --conventional-prerelease
           fi
 
       - name: Set Git User
@@ -73,3 +68,15 @@ jobs:
         run: |
           git add .
           git commit -m "chore: update changelogs and package versions" || echo "No changes to commit"
+
+      - name: Publish with Lerna
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
+        run: |
+          if [ "$publish_type" == "stable" ]; then
+            npx lerna publish patch --yes --conventional-commits --conventional-graduate
+          elif [ "$publish_type" == "beta" ]; then
+            npx lerna publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease
+          else
+            npx lerna publish prerelease --preid alpha --yes --conventional-commits --conventional-prerelease
+          fi
