@@ -57,11 +57,11 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         run: |
           if [ "$publish_type" == "stable" ]; then
-            npx lerna publish patch --yes --conventional-commits --no-commit --message "chore: update changelogs and package versions" --conventional-graduate
+            npx lerna publish patch --yes --conventional-commits --conventional-graduate --no-commit --message "chore: update changelogs and package versions"
           elif [ "$publish_type" == "beta" ]; then
-            npx lerna publish prerelease --preid beta --yes --conventional-commits --no-commit --message "chore: update changelogs and package versions" --conventional-prerelease
+            npx lerna publish prerelease --preid beta --yes --conventional-commits --no-commit --message "chore: update changelogs and package versions"
           else
-            npx lerna publish prerelease --preid alpha --yes --conventional-commits --no-commit --message "chore: update changelogs and package versions" --conventional-prerelease
+            npx lerna publish prerelease --preid alpha --yes --conventional-commits --no-commit --message "chore: update changelogs and package versions"
           fi
 
       - name: Set Git User
