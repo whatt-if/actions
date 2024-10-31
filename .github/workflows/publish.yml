@@ -51,13 +51,7 @@ jobs:
 
       - name: Generate changelogs and update versions
         run: |
-          if [ "$publish_type" == "stable" ]; then
-            npx lerna@6.x version patch --yes --conventional-commits --no-commit --conventional-graduate
-          elif [ "$publish_type" == "beta" ]; then
-            npx lerna@6.x version prerelease --preid beta --yes --conventional-commits --no-commit --conventional-prerelease
-          else
-            npx lerna@6.x version prerelease --preid alpha --yes --conventional-commits --no-commit --conventional-prerelease
-          fi
+          npx lerna@6.0.0 version patch --yes --conventional-commits --no-commit --conventional-graduate
 
       - name: Set Git User
         run: |
@@ -74,9 +68,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         run: |
           if [ "$publish_type" == "stable" ]; then
-            npx lerna@6.x publish patch --yes --conventional-commits --conventional-graduate
+            npx lerna@6.0.0 publish patch --yes --conventional-commits --conventional-graduate
           elif [ "$publish_type" == "beta" ]; then
-            npx lerna@6.x publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease
+            npx lerna@6.0.0 publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease
           else
-            npx lerna@6.x publish prerelease --preid alpha --yes --conventional-commits --conventional-prerelease
+            npx lerna@6.0.0 publish prerelease --preid alpha --yes --conventional-commits --conventional-prerelease
           fi
