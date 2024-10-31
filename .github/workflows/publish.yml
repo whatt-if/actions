@@ -51,26 +51,16 @@ jobs:
 
       - name: Generate changelogs and update versions
         run: |
-          npx lerna@5.1.6 version patch --yes --conventional-commits --conventional-graduate
-
-      # - name: Set Git User
-      #   run: |
-      #     git config --global user.name "GitHub Action"
-      #     git config --global user.email "action@github.com"
-
-      # - name: Commit Changes
-      #   run: |
-      #     git add .
-      #     git commit -m "chore: update changelogs and package versions" || echo "No changes to commit"
+          npx lerna@5.1.6 version patch --yes --conventional-commits --no-commit --conventional-graduate --ignore-private
 
       - name: Publish with Lerna
         env:
           NODE_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         run: |
           if [ "$publish_type" == "stable" ]; then
-            npx lerna@5.1.6 publish patch --yes --conventional-commits --conventional-graduate
+            npx lerna@5.1.6 publish patch --yes --conventional-commits --conventional-graduate --ignore-private
           elif [ "$publish_type" == "beta" ]; then
-            npx lerna@5.1.6 publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease
+            npx lerna@5.1.6 publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease --ignore-private
           else
-            npx lerna@5.1.6 publish prerelease --preid alpha --yes --conventional-commits --conventional-prerelease
+            npx lerna@5.1.6 publish prerelease --preid alpha --yes --conventional-commits --conventional-prerelease --ignore-private
           fi
