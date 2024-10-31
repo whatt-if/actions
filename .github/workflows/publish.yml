@@ -57,7 +57,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         run: |
-          CHANGED_PACKAGES=$(npx lerna@5.1.6 changed --json | jq -r '.[].name')
+          CHANGED_PACKAGES=$(npx lerna@5.1.6 changed --json | jq -r '.[] | select(.location | startswith("packages/")) | .name')
           if [ -z "$CHANGED_PACKAGES" ]; then
             echo "No packages changed, skipping publish."
             exit 0
