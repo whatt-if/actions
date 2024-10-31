@@ -51,17 +51,17 @@ jobs:
 
       - name: Generate changelogs and update versions
         run: |
-          npx lerna@5.1.6 version patch --yes --conventional-commits --no-commit --conventional-graduate
+          npx lerna@5.1.6 version patch --yes --conventional-commits --conventional-graduate
 
-      - name: Set Git User
-        run: |
-          git config --global user.name "GitHub Action"
-          git config --global user.email "action@github.com"
+      # - name: Set Git User
+      #   run: |
+      #     git config --global user.name "GitHub Action"
+      #     git config --global user.email "action@github.com"
 
-      - name: Commit Changes
-        run: |
-          git add .
-          git commit -m "chore: update changelogs and package versions" || echo "No changes to commit"
+      # - name: Commit Changes
+      #   run: |
+      #     git add .
+      #     git commit -m "chore: update changelogs and package versions" || echo "No changes to commit"
 
       - name: Publish with Lerna
         env:
