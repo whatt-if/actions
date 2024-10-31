@@ -51,16 +51,22 @@ jobs:
 
       - name: Generate changelogs and update versions
         run: |
-          npx lerna@5.1.6 version patch --yes --conventional-commits --no-commit --conventional-graduate --ignore-private
+          npx lerna@5.1.6 version patch --yes --conventional-commits --conventional-graduate
 
       - name: Publish with Lerna
         env:
           NODE_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         run: |
+          CHANGED_PACKAGES=$(npx lerna@5.1.6 changed --json | jq -r '.[].name')
+          if [ -z "$CHANGED_PACKAGES" ]; then
+            echo "No packages changed, skipping publish."
+            exit 0
+          fi
+
           if [ "$publish_type" == "stable" ]; then
-            npx lerna@5.1.6 publish patch --yes --conventional-commits --conventional-graduate --ignore-private
+            npx lerna@5.1.6 publish patch --yes --conventional-commits --conventional-graduate
           elif [ "$publish_type" == "beta" ]; then
-            npx lerna@5.1.6 publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease --ignore-private
+            npx lerna@5.1.6 publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease
           else
-            npx lerna@5.1.6 publish prerelease --preid alpha --yes --conventional-commits --conventional-prerelease --ignore-private
+            npx lerna@5.1.6 publish prerelease --preid alpha --yes --conventional-commits --conventional-prerelease
           fi
