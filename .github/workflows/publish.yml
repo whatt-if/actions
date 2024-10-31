@@ -68,9 +68,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.AUTH_TOKEN }}
         run: |
           if [ "$publish_type" == "stable" ]; then
-            npx lerna@6.0.0 publish patch --yes --conventional-commits --conventional-graduate
+            npx lerna@5.1.6 publish patch --yes --conventional-commits --conventional-graduate
           elif [ "$publish_type" == "beta" ]; then
-            npx lerna@6.0.0 publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease
+            npx lerna@5.1.6 publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease
           else
-            npx lerna@6.0.0 publish prerelease --preid alpha --yes --conventional-commits --conventional-prerelease
+            npx lerna@5.1.6 publish prerelease --preid alpha --yes --conventional-commits --conventional-prerelease
           fi
