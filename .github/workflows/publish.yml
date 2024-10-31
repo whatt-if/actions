@@ -51,7 +51,7 @@ jobs:
 
       - name: Generate changelogs and update versions
         run: |
-          npx lerna@6.0.0 version patch --yes --conventional-commits --no-commit --conventional-graduate
+          npx lerna@5.1.6 version patch --yes --conventional-commits --no-commit --conventional-graduate
 
       - name: Set Git User
         run: |
