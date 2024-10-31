@@ -62,7 +62,7 @@ jobs:
 
       - name: Generate changelogs and update versions
         run: |
-          npx lerna@5.1.6 version patch --yes --conventional-commits --conventional-graduate --no-git-tag-version
+          npx lerna@5.1.6 version patch --yes --conventional-commits --no-git-tag-version
 
       - name: Publish with Lerna
         env:
@@ -75,7 +75,7 @@ jobs:
           fi
 
           if [ "$publish_type" == "stable" ]; then
-            npx lerna@5.1.6 publish patch --yes --conventional-commits --conventional-graduate --no-git-tag-version
+            npx lerna@5.1.6 publish patch --yes --conventional-commits --no-git-tag-version
           elif [ "$publish_type" == "beta" ]; then
             npx lerna@5.1.6 publish prerelease --preid beta --yes --conventional-commits --conventional-prerelease --no-git-tag-version
           else
