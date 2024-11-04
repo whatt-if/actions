@@ -64,20 +64,12 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: 🛠 Debug Auth
-        if: env.package_exists == 'true'
-        run: |
-          cat ~/.npmrc
-          echo "NODE_AUTH_TOKEN is set"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
-
       - name: 🚀 Version and Publish Packages
         if: env.package_exists == 'true'
         uses: changesets/action@v1
         with:
           version: pnpm changeset version
-          publish: pnpm changeset publish --verbose
+          publish: pnpm changeset publish
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
