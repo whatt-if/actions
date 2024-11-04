@@ -1,0 +1,54 @@
+name: '🎯 Check everything'
+
+on:
+  workflow_call:
+    secrets:
+      GH_TOKEN:
+
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Enable Corepack
+        run: corepack enable
+
+      - name: 📦 Install pnpm
+        run: npm install -g pnpm
+
+      - name: 🔐 Configure NPM for GitHub Packages
+        run: |
+          echo "@whatt-if:registry=https://npm.pkg.github.com" > ~/.npmrc
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" >> ~/.npmrc
+          echo "always-auth=true" >> ~/.npmrc
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: 📂 Cache pnpm dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.local/share/pnpm/store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: 📥 Install dependencies with pnpm
+        if: "hashFiles('**/package.json') != ''"
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
+
+      - name: ⏩ Run Turbo Check
+        if: "hashFiles('**/package.json') != ''"
+        run: |
+          npx turbo run lint test build
