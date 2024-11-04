@@ -1,0 +1,62 @@
+name: '🌔 Sync Labels List'
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync-labels:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v2
+
+      - name: 🔄 Sync Labels
+        uses: actions-ecosystem/action-label-syncer@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          repositories: |
+            whatt-if/repo1
+            whatt-if/repo2
+            whatt-if/repo3
+            # Adicione outros repositórios da organização aqui
+          labels: |
+            - name: feat
+              color: "3D9970"
+              description: "Indicates a new feature for the project"
+            - name: fix
+              color: "FF4136"
+              description: "Represents a bug fix in the project"
+            - name: chore
+              color: "AAAAAA"
+              description: "Minor updates to build process or auxiliary tools"
+            - name: docs
+              color: "0074D9"
+              description: "Documentation-only changes"
+            - name: style
+              color: "FF851B"
+              description: "Changes that do not affect code meaning (formatting only)"
+            - name: refactor
+              color: "7FDBFF"
+              description: "Code changes that neither fix a bug nor add a feature"
+            - name: perf
+              color: "2ECC40"
+              description: "Changes that improve performance"
+            - name: test
+              color: "B10DC9"
+              description: "Adding or modifying tests"
+            - name: build
+              color: "85144b"
+              description: "Changes that affect the build system or external dependencies"
+            - name: ci
+              color: "3D9970"
+              description: "Changes to CI configuration files and scripts"
+            - name: alpha
+              color: "F012BE"
+              description: "Initial pre-release for testing; may contain experimental features"
+            - name: beta
+              color: "FF851B"
+              description: "Pre-release with more stable features; not ready for production"
+            - name: stable
+              color: "2ECC40"
+              description: "Production-ready release; safe for deployment"
