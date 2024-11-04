@@ -1,0 +1,36 @@
+name: '🔍 Semantic Title Check'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+on:
+  workflow_call:
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v3
+
+  check-title:
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📋 Get Pull Request Title
+        id: pr_title
+        run: echo "::set-output name=title::${{ github.event.pull_request.title }}"
+
+      - name: 🔍 Check Semantic Title
+        env:
+          PR_TITLE: ${{ steps.pr_title.outputs.title }}
+        run: |
+          # Define valid prefixes for titles
+          SEMANTIC_PREFIXES="^(feat|fix|refactor|breaking|upgrade|revamp|chore|docs|style|test|perf): "
+          if [[ ! "$PR_TITLE" =~ $SEMANTIC_PREFIXES ]]; then
+            echo "❌ The PR title does not follow semantic convention. Use one of the following prefixes: feat, fix, refactor, breaking, upgrade, revamp, chore, docs, style, test, perf."
+            exit 1
+          else
+            echo "✅ The PR title follows the semantic convention."
+          fi
