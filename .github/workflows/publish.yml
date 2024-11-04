@@ -47,6 +47,13 @@ jobs:
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" >> ~/.npmrc
           echo "always-auth=true" >> ~/.npmrc
 
+      - name: 🔑 Login to GitHub Packages
+        if: env.package_exists == 'true'
+        run: |
+          pnpm config set //npm.pkg.github.com/:_authToken "${{ secrets.GH_TOKEN }}"
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
       - name: 📂 Cache pnpm dependencies
         if: env.package_exists == 'true'
         uses: actions/cache@v3
