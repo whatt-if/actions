@@ -11,6 +11,7 @@ on:
 
 jobs:
   publish:
+    if: "hashFiles('**/package.json') != ''"
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout code
@@ -22,7 +23,6 @@ jobs:
           node-version: '20'
 
       - name: 📦 Install pnpm (if not installed)
-        if: "hashFiles('**/package.json') != ''"
         run: |
           if ! command -v pnpm &> /dev/null; then
             npm install -g pnpm
@@ -31,14 +31,12 @@ jobs:
           fi
 
       - name: 🔐 Configure NPM for GitHub Packages
-        if: "hashFiles('**/package.json') != ''"
         run: |
           echo "@whatt-if:registry=https://npm.pkg.github.com" > ~/.npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" >> ~/.npmrc
           echo "always-auth=true" >> ~/.npmrc
 
       - name: 📂 Cache pnpm dependencies
-        if: "hashFiles('**/package.json') != ''"
         uses: actions/cache@v3
         with:
           path: ~/.local/share/pnpm/store
@@ -47,13 +45,11 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: 📥 Install dependencies with pnpm
-        if: "hashFiles('**/package.json') != ''"
         run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: 🚀 Version and Publish Packages
-        if: "hashFiles('**/package.json') != ''"
         uses: changesets/action@v1
         with:
           version: pnpm changeset version
