@@ -22,14 +22,18 @@ jobs:
 
       - name: 🔍 Check for package.json
         run: |
-          if [ ! -f "package.json" ]; then
-            echo "No package.json found. Skipping steps." && exit 0
+          if [ -f "package.json" ]; then
+            echo "package_exists=true" >> $GITHUB_ENV
+          else
+            echo "package_exists=false" >> $GITHUB_ENV
           fi
 
       - name: ⚙️ Enable Corepack
+        if: env.package_exists == 'true'
         run: corepack enable
 
       - name: 📦 Install pnpm (if not already installed)
+        if: env.package_exists == 'true'
         run: |
           if ! command -v pnpm &> /dev/null; then
             npm install -g pnpm
@@ -38,6 +42,7 @@ jobs:
           fi
 
       - name: 🔐 Configure NPM for GitHub Packages
+        if: env.package_exists == 'true'
         run: |
           echo "@whatt-if:registry=https://npm.pkg.github.com" > ~/.npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" >> ~/.npmrc
@@ -46,6 +51,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: 📂 Cache pnpm dependencies
+        if: env.package_exists == 'true'
         uses: actions/cache@v3
         with:
           path: ~/.local/share/pnpm/store
@@ -54,10 +60,12 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: 📥 Install dependencies with pnpm
+        if: env.package_exists == 'true'
         run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: ⏩ Run Turbo Check
+        if: env.package_exists == 'true'
         run: |
           npx turbo run lint test build

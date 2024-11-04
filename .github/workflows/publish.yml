@@ -18,20 +18,21 @@ jobs:
         uses: actions/checkout@v3
 
       - name: 🔍 Check for package.json
-        id: check_package
         run: |
           if [ ! -f "package.json" ]; then
-            echo "No package.json found. Exiting..."
-            exit 0
+            echo "package_exists=false" >> $GITHUB_ENV
+          else
+            echo "package_exists=true" >> $GITHUB_ENV
           fi
-          echo "package_exists=true" >> $GITHUB_ENV
 
       - name: ⚙️ Setup Node
+        if: env.package_exists == 'true'
         uses: actions/setup-node@v3
         with:
           node-version: '20'
 
       - name: 📦 Install pnpm (if not installed)
+        if: env.package_exists == 'true'
         run: |
           if ! command -v pnpm &> /dev/null; then
             npm install -g pnpm
@@ -40,12 +41,14 @@ jobs:
           fi
 
       - name: 🔐 Configure NPM for GitHub Packages
+        if: env.package_exists == 'true'
         run: |
           echo "@whatt-if:registry=https://npm.pkg.github.com" > ~/.npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" >> ~/.npmrc
           echo "always-auth=true" >> ~/.npmrc
 
       - name: 📂 Cache pnpm dependencies
+        if: env.package_exists == 'true'
         uses: actions/cache@v3
         with:
           path: ~/.local/share/pnpm/store
@@ -54,11 +57,13 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: 📥 Install dependencies with pnpm
+        if: env.package_exists == 'true'
         run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: 🚀 Version and Publish Packages
+        if: env.package_exists == 'true'
         uses: changesets/action@v1
         with:
           version: pnpm changeset version
@@ -69,6 +74,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: 🛠 Debug Auth
+        if: env.package_exists == 'true'
         run: |
           cat ~/.npmrc
           echo "NODE_AUTH_TOKEN is set"
