@@ -14,20 +14,31 @@ on:
 
 jobs:
   build-and-test:
-    if: "hashFiles('**/package.json') != ''"
     runs-on: ubuntu-latest
 
     steps:
       - name: 📥 Checkout code
         uses: actions/checkout@v3
 
+      - name: 🔍 Check for package.json
+        id: check_package
+        run: |
+          if [ -f "package.json" ]; then
+            echo "package_exists=true" >> $GITHUB_ENV
+          else
+            echo "package_exists=false" >> $GITHUB_ENV
+          fi
+
       - name: ⚙️ Enable Corepack
+        if: env.package_exists == 'true'
         run: corepack enable
 
       - name: 📦 Install pnpm
+        if: env.package_exists == 'true'
         run: npm install -g pnpm
 
       - name: 🔐 Configure NPM for GitHub Packages
+        if: env.package_exists == 'true'
         run: |
           echo "@whatt-if:registry=https://npm.pkg.github.com" > ~/.npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_TOKEN }}" >> ~/.npmrc
@@ -36,6 +47,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: 📂 Cache pnpm dependencies
+        if: env.package_exists == 'true'
         uses: actions/cache@v3
         with:
           path: ~/.local/share/pnpm/store
@@ -44,12 +56,12 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: 📥 Install dependencies with pnpm
-        if: "hashFiles('**/package.json') != ''"
+        if: env.package_exists == 'true'
         run: pnpm install --frozen-lockfile
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GH_TOKEN }}
 
       - name: ⏩ Run Turbo Check
-        if: "hashFiles('**/package.json') != ''"
+        if: env.package_exists == 'true'
         run: |
           npx turbo run lint test build
